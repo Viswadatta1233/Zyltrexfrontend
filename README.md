@@ -19,20 +19,34 @@ A professional, enterprise-grade task management application built with React, R
 
 ## Screenshots
 
-### Sign Up Page
-![Signup Page](./screenshots/Signup.png)
-
-### Dashboard Overview
-![Dashboard Top](./screenshots/dashboard%20top.png)
-
-### Task Management Modals
-![Create and Edit Modals](./screenshots/create%20and%20edit%20modals.png)
-
-### AI-Powered Insights
-![AI Insights](./screenshots/AIInsights.png)
-
-### Pagination
-![Pagination](./screenshots/pagination.png)
+<table>
+<tr>
+<td width="50%">
+<strong>Sign Up Page</strong><br/>
+<img src="./screenshots/Signup.png" alt="Signup Page" width="100%"/>
+</td>
+<td width="50%">
+<strong>Dashboard Overview</strong><br/>
+<img src="./screenshots/dashboard top.png" alt="Dashboard Top" width="100%"/>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<strong>Task Management Modals</strong><br/>
+<img src="./screenshots/create and edit modals.png" alt="Create and Edit Modals" width="100%"/>
+</td>
+<td width="50%">
+<strong>AI-Powered Insights</strong><br/>
+<img src="./screenshots/AIInsights.png" alt="AI Insights" width="100%"/>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="center">
+<strong>Pagination</strong><br/>
+<img src="./screenshots/pagination.png" alt="Pagination" width="70%"/>
+</td>
+</tr>
+</table>
 
 ## Tech Stack
 
