@@ -12,7 +12,7 @@ const initialState = {
   sortOrder: 'desc',
   pagination: {
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 9,
   },
 };
 
