@@ -1,3 +1,18 @@
+/**
+ * TaskModal Component
+ * 
+ * Modal dialog for creating and editing tasks.
+ * Handles both create and edit modes based on whether a task prop is provided.
+ * 
+ * Features:
+ * - Create new tasks or edit existing ones
+ * - Form validation
+ * - Dark mode support
+ * - Date/time picker for deadlines
+ * - Completion status toggle
+ * - Automatic Redux state updates
+ */
+
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { tasksAPI } from '../services/api';
@@ -5,28 +20,51 @@ import { addTask, updateTask } from '../store/slices/tasksSlice';
 import { FaTimes, FaCalendarAlt, FaCheckCircle } from 'react-icons/fa';
 import { HiOutlineDocumentText, HiOutlineClock } from 'react-icons/hi';
 
+/**
+ * TaskModal - Create/Edit Task Modal Component
+ * 
+ * @param {Object} props
+ * @param {Object|null} props.task - Task object to edit (null for create mode)
+ * @param {boolean} props.isOpen - Controls modal visibility
+ * @param {Function} props.onClose - Callback function called when modal is closed
+ */
 const TaskModal = ({ task, isOpen, onClose }) => {
   const dispatch = useDispatch();
+  
+  // Form state - stores task data being edited/created
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     deadline: '',
     completed: false,
   });
-  const [loading, setLocalLoading] = useState(false);
-  const { darkMode } = useSelector((state) => state.theme);
-  const iconClass = darkMode ? 'text-white' : 'text-gray-700';
+  
+  const [loading, setLocalLoading] = useState(false); // Loading state for async operations
+  const { darkMode } = useSelector((state) => state.theme); // Get theme from Redux
+  const iconClass = darkMode ? 'text-white' : 'text-gray-700'; // Theme-aware icon color
 
+  /**
+   * Effect: Initialize form data when task prop changes
+   * 
+   * When editing (task exists):
+   * - Pre-fills form with existing task data
+   * - Converts ISO date string to datetime-local format for the input
+   * 
+   * When creating (task is null):
+   * - Resets form to empty state
+   */
   useEffect(() => {
     if (task) {
+      // Edit mode - populate form with existing task data
       setFormData({
         title: task.title || '',
         description: task.description || '',
+        // Convert ISO date to datetime-local format (YYYY-MM-DDTHH:mm)
         deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '',
         completed: task.completed || false,
       });
     } else {
-      // Reset form when creating a new task
+      // Create mode - reset form to empty state
       setFormData({
         title: '',
         description: '',
@@ -36,43 +74,68 @@ const TaskModal = ({ task, isOpen, onClose }) => {
     }
   }, [task]);
 
+  /**
+   * Handles input field changes
+   * Supports both text inputs and checkboxes
+   * 
+   * @param {Event} e - Input change event
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
+      // Checkboxes use 'checked', other inputs use 'value'
       [name]: type === 'checkbox' ? checked : value,
     });
   };
 
+  /**
+   * Handles form submission
+   * 
+   * Process:
+   * 1. Prevents default form submission
+   * 2. Converts frontend data format to backend format:
+   *    - completed (boolean) → status ('Done' | 'Pending')
+   *    - datetime-local string → ISO 8601 string
+   * 3. Calls appropriate API (create or update)
+   * 4. Updates Redux store with the result
+   * 5. Closes modal on success
+   * 
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalLoading(true);
     try {
-      // Convert completed boolean to status for backend
-      // Convert datetime-local format to ISO format
+      // Transform form data to match backend API format
       const taskData = {
         title: formData.title,
         description: formData.description || '',
+        // Convert datetime-local to ISO 8601 format, or null if empty
         deadline: formData.deadline ? new Date(formData.deadline).toISOString() : null,
+        // Convert boolean completed to status string for backend
         status: formData.completed ? 'Done' : 'Pending'
       };
       
       if (task) {
+        // Edit mode - update existing task
         const updated = await tasksAPI.updateTask(task.id, taskData);
-        dispatch(updateTask(updated));
+        dispatch(updateTask(updated)); // Update Redux store
       } else {
+        // Create mode - create new task
         const newTask = await tasksAPI.createTask(taskData);
-        dispatch(addTask(newTask));
+        dispatch(addTask(newTask)); // Add to Redux store
       }
-      onClose();
+      onClose(); // Close modal on success
     } catch (error) {
       console.error('Failed to save task:', error);
       alert('Failed to save task. Please try again.');
     } finally {
-      setLocalLoading(false);
+      setLocalLoading(false); // Always reset loading state
     }
   };
 
+  // Don't render modal if it's not open
   if (!isOpen) return null;
 
   return (
